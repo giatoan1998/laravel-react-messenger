@@ -2,13 +2,15 @@ import ChatLayout from '@/Layouts/ChatLayout';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useEffect, useRef, useState } from 'react';
 import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
+import ConversationHeader from '@/Components/App/ConversationHeader';
+import MessageItem from '@/Components/App/MessageItem';
 
-function Home({ messages }) {
+function Home({ selectedConversation = null, messages = null, onlineUsers }) {
     const [localMessages, setLocalMessages] = useState([]);
     const messagesCtrRef = useRef(null);
 
     useEffect(() => {
-        setLocalMessages(messages);
+        setLocalMessages(messages ? messages.data.reverse() : []);
     }, [messages]);
 
     return (
@@ -44,7 +46,7 @@ function Home({ messages }) {
                             </div>
                         )}
                     </div>
-                    <MessageInput conversation={selectedConversation}/>
+                    {/* <MessageInput conversation={selectedConversation}/> */}
                 </>
             )}
         </>

@@ -57,11 +57,15 @@ const ChatLayout = ({ children }) => {
                 }
             })
         );
-    }, [setLocalConversations]);
+    }, [localConversations]);
+
+    console.log("sortedConversations", sortedConversations);
 
     useEffect(() => {
         setLocalConversations(conversations);
     }, [conversations]);
+
+    console.log("localConversations", );
 
     useEffect(() => {
         Echo.join("online")

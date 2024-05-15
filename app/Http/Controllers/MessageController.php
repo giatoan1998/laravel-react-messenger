@@ -18,7 +18,7 @@ class MessageController extends Controller
 {
     public function byUser(User $user)
     {
-        $messages = Message::where('sender_id'. auth()->id())
+        $messages = Message::where('sender_id', auth()->id())
             ->where('receiver_id', $user->id)
             ->orWhere('sender_id', $user->id)
             ->where('receiver_id', auth()->id())
