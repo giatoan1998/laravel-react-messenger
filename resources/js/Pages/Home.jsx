@@ -4,13 +4,22 @@ import { useEffect, useRef, useState } from 'react';
 import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
 import ConversationHeader from '@/Components/App/ConversationHeader';
 import MessageItem from '@/Components/App/MessageItem';
+import MessageInput from '@/Components/App/MessageInput';
 
-function Home({ selectedConversation = null, messages = null, onlineUsers }) {
+function Home({ selectedConversation = null, messages = null }) {
     const [localMessages, setLocalMessages] = useState([]);
     const messagesCtrRef = useRef(null);
 
     useEffect(() => {
-        setLocalMessages(messages ? messages.data.reverse() : []);
+        setTimeout(() => {
+            if (messagesCtrRef.current) {
+                messagesCtrRef.current.scrollTop = messagesCtrRef.current.scrollHeight;
+            }
+        }, 10);
+    }, [selectedConversation]);
+
+    useEffect(() => {
+            setLocalMessages(messages ? messages.data.reverse() : []);
     }, [messages]);
 
     return (
@@ -25,8 +34,8 @@ function Home({ selectedConversation = null, messages = null, onlineUsers }) {
             )}
             {messages && (
                 <>
-                    <ConversationHeader/>
-                    <div 
+                    <ConversationHeader selectedConversation={selectedConversation}/>
+                    <div
                         ref={messagesCtrRef}
                         className="flex-1 overflow-y-auto p-5"
                     >
@@ -46,7 +55,7 @@ function Home({ selectedConversation = null, messages = null, onlineUsers }) {
                             </div>
                         )}
                     </div>
-                    {/* <MessageInput conversation={selectedConversation}/> */}
+                    <MessageInput conversation={selectedConversation}/>
                 </>
             )}
         </>

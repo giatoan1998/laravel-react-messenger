@@ -20,8 +20,7 @@ const ChatLayout = ({ children }) => {
     const isUserOnline = (userId) => onlineUsers[userId];
     // trả về true nếu userId có trong đối tượng onlineUsers.
     
-    // console.log("conversations123", conversations);
-    // console.log("selectedConversation456", selectedConversation);
+    
 
     const onSearch = (ev) => {
         const search = ev.target.value.toLowerCase();
@@ -59,13 +58,9 @@ const ChatLayout = ({ children }) => {
         );
     }, [localConversations]);
 
-    console.log("sortedConversations", sortedConversations);
-
     useEffect(() => {
         setLocalConversations(conversations);
     }, [conversations]);
-
-    console.log("localConversations", );
 
     useEffect(() => {
         Echo.join("online")
