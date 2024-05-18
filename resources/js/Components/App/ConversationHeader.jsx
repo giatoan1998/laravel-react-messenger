@@ -4,7 +4,6 @@ import GroupAvatar from "./GroupAvatar";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 
 const ConversationHeader = ({ selectedConversation }) => {
-    console.log("selectedConversation", selectedConversation);
     return (
         <>
             {selectedConversation && (

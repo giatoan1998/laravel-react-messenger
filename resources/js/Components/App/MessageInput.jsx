@@ -8,7 +8,7 @@ const MessageInput = ({ conversation = null }) => {
     const [inputErrorMessage, setInputErrorMessage] = useState("");
     const [messageSending, setMessageSending] = useState(false);
 
-    const onSend = () => {
+    const onSendClick = () => {
         if (newMessage.trim() === "") {
             setInputErrorMessage("Please provide a message or upload attachments.");
             setTimeout(() => {
@@ -18,13 +18,13 @@ const MessageInput = ({ conversation = null }) => {
             return;
         }
         const formData = new FormData();
+        formData.append("message", newMessage);
 
         if (conversation.is_user) {
-            formData.append("reciever_id", conversation.id);
+            formData.append("receiver_id", conversation.id);
         } else if (conversation.is_group) {
             formData.append("group_id", conversation.id);
         }
-
         setMessageSending(true);
         axios
             .post(route("message.store"), formData, {
