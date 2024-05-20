@@ -29,6 +29,7 @@ class MessageController extends Controller
         return inertia('Home', [
             'selectedConversation' => $user->toConversationArray(),
             'messages' => MessageResource::collection($messages),
+            'toan' => 'toan123tcom',
         ]);
     }
 
