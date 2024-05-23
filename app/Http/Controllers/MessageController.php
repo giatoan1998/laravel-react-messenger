@@ -47,7 +47,7 @@ class MessageController extends Controller
     }
 
     public function loadOlder(Message $message)
-    {
+    {   
         // Load older messages that are older than the given message, sort them by th latest.
         if ($message->group_id) {
             $messages = Message::where('created_at', '<', $message->created_at)
@@ -60,7 +60,7 @@ class MessageController extends Controller
                 ->where(function ($query) use ($message) {
                     $query->where('sender_id', $message->sender_id)
                         ->where('receiver_id', $message->receiver_id)
-                        ->orWhere('sender_id', $message->message->receiver_id)
+                        ->orWhere('sender_id', $message->receiver_id)
                         ->where('receiver_id', $message->sender_id)
                     ;
                 })

@@ -1,17 +1,19 @@
-import ChatLayout from '@/Layouts/ChatLayout';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
-import ConversationHeader from '@/Components/App/ConversationHeader';
-import MessageItem from '@/Components/App/MessageItem';
-import MessageInput from '@/Components/App/MessageInput';
-import { useEventBus } from '@/EventBus';
-import axios from 'axios';
+import ChatLayout from "@/Layouts/ChatLayout";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/solid";
+import ConversationHeader from "@/Components/App/ConversationHeader";
+import MessageItem from "@/Components/App/MessageItem";
+import MessageInput from "@/Components/App/MessageInput";
+import { useEventBus } from "@/EventBus";
+import axios from "axios";
 
 function Home({ selectedConversation = null, messages = null }) {
     const [localMessages, setLocalMessages] = useState([]);
-    const messagesCtrRef = useRef(null);
+    const [noMoreMessages, setNoMoreMessages] = useState(false);
+    const [scrollFromBottom, setScrollFromBottom] = useState(0);
     const loadMoreIntersect = useRef(null);
+    const messagesCtrRef = useRef(null);
     const { on } = useEventBus();
 
     const messageCreated = (message) => {
@@ -33,12 +35,17 @@ function Home({ selectedConversation = null, messages = null }) {
     };
 
     const loadMoreMessages = useCallback(() => {
+        console.log("Loading more message", noMoreMessages);
+        if (noMoreMessages) {
+            return;
+        }
         // Find the first message object
         const firstMessage = localMessages[0];
         axios
             .get(route("message.loadOlder", firstMessage.id))
             .then(({ data }) => {
-                if (data.data.lenth === 0) {
+                if (data.data.length === 0) {
+                    console.log("No more message");
                     setNoMoreMessages(true);
 
                     return;
@@ -48,10 +55,13 @@ function Home({ selectedConversation = null, messages = null }) {
                 const scrollTop = messagesCtrRef.current.scrollTop; // Client Scroll.
                 const clientHeight = messagesCtrRef.current.clientHeight; // Visible area.
                 const tmpScrollFromBottom = scrollHeight - scrollTop - clientHeight;
-                console.log("tmpScrollFromBottom", tmpScrollFromBottom);
                 setScrollFromBottom(scrollHeight - scrollTop - clientHeight);
-            })
-    }, [localMessages]);
+
+                setLocalMessages((prevMessages) => {
+                    return [...data.data.reverse(), ...prevMessages];
+                });
+            });
+    }, [localMessages, noMoreMessages]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -61,6 +71,9 @@ function Home({ selectedConversation = null, messages = null }) {
         }, 10);
 
         const offCreated = on('message.created', messageCreated);
+
+        setScrollFromBottom(0);
+        setNoMoreMessages(false);
 
         return () => {
             offCreated();
@@ -80,11 +93,11 @@ function Home({ selectedConversation = null, messages = null }) {
                 scrollFromBottom;
         }
 
-        if (setNoMoreMessages) {
+        if (noMoreMessages) {
             return;
         }
 
-        const observer = new IntersectObserve(
+        const observer = new IntersectionObserver(
             (entries) =>
                 entries.forEach(
                     (entry) => entry.isIntersecting && loadMoreMessages()
@@ -96,9 +109,13 @@ function Home({ selectedConversation = null, messages = null }) {
 
         if (loadMoreIntersect.current) {
             setTimeout(() => {
-                observer.observer(loadMoreIntersect.current);
+                observer.observe(loadMoreIntersect.current);
             }, 100);
         }
+
+        return () => {
+            observer.disconnect();
+        };
     }, [localMessages]);
 
     return (
